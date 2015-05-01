@@ -1,0 +1,23 @@
+{
+  "name": "epgdownloader",
+  "version": "1.0.0",
+  "description": "Downloads EPG from multiple EPG providers and store it.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fcgravalos/epg-downloader"
+  },
+  "keywords": [
+    "EPG",
+    "nodejs"
+  ],
+  "author": "Fernando Crespo Grávalos",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fcgravalos/epg-downloader/issues"
+  },
+  "homepage": "https://github.com/fcgravalos/epg-downloader"
+}
