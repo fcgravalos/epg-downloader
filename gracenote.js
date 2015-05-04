@@ -141,4 +141,4 @@ function channelLookUpCallback(){}
  */
 function channelLookUp(){}
 
-register();
+initialize();
