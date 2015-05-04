@@ -6,9 +6,9 @@
 */
 
 // Load required modules
+var fs = require('fs');
 var gnRequest = require('https').request;
 var config = require('./config.js');
-var fs = require('fs');
 
 // Reading properties from config. 
 var apiUrl = config('gnApiUrl');
