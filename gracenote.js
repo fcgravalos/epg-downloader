@@ -8,6 +8,7 @@
 // Load required modules
 var fs = require('fs');
 var gnRequest = require('https').request;
+var xmlParser = require('xml2js').parseString;
 var config = require('./config.js');
 
 // Reading properties from config. 
@@ -66,9 +67,22 @@ function gnHttpRequest(body, callback) {
     request.end();
 }
 
-/******************************************
- * SECTION : GRACENOTE REGISTER FUNCTIONS *
- ******************************************/
+/************************************
+ * SECTION: ERROR HANDLING FUNCTION *
+ ************************************/
+
+/*
+ * Function: gnError.
+ * Description: Prints out error message that GraceNote provides. To improve.
+ * Receives: A String which contains the error message.
+ */
+function gnError(error) {
+    console.log("[FAILED]" + error);
+}
+
+/*****************************************
+ * SECTION: GRACENOTE REGISTER FUNCTIONS *
+ *****************************************/
 
 /*
  * Function: initialize.
@@ -76,24 +90,7 @@ function gnHttpRequest(body, callback) {
  * the user in Gracenote.
  */
 function initialize(){
-    userId === "@@USERID@@" ? register() : undefined
-}
-
-/*
- * Function: registerCallback.
- * Description: Callback function that will be passed to gnHttpRequest.
- * It will update config.js with the new userId fetched from Gracenote.
- * Parameter: A String which represents the XML response from Gracenote.
- */  
-function registerCallback(xmlResponse){
-    console.log(xmlResponse);
-    var newUserId = "26552415133633167-A5011D7797DCE7F1D8611C2D1315A5F1";
-    // This needs to be done synchronously. This could change to async if multi API users //supported.
-    console.log("[INFO] UPDATING CONFIGURATION");
-    var configFileContent = fs.readFileSync('./config.js', {encoding: 'utf-8'});
-    configFileContent = configFileContent.replace(userId, newUserId);
-    fs.writeFileSync('./config.js', configFileContent);
-    console.log("[INFO] CONFIGURATION UPDATED SUCCESSFULLY!");
+    userId === "@@USERID@@" ? register() : console.log("[INFO] Found user ID in config: " + userId)
 }
 
 /*
@@ -101,8 +98,43 @@ function registerCallback(xmlResponse){
  * Description: Builds the XML body request and passes it and the registerCallback 
  * to gnHttpRequest
  */  
-function register() {  
+function register() {
+    //Next step: Create XML with any npm package.
     gnHttpRequest("<QUERIES><QUERY CMD='REGISTER'><CLIENT>15779840-29EADFCFD79116D69600C0DDD4BC2AD8</CLIENT></QUERY></QUERIES>", registerCallback);
+}
+
+/*
+ * Function: registerCallback.
+ * Description: Callback function that will be passed to gnHttpRequest.
+ * It will update config.js with the new userId fetched from Gracenote.
+ * Parameter: A String which contains the XML response from Gracenote.
+ */  
+function registerCallback(xmlResponse){
+    xmlParser(xmlResponse, function(error, data){
+        if(error) throw(error);
+        else {
+            var status = data.RESPONSES.RESPONSE[0]['$'].STATUS
+            status === 'OK' ? updateUserId(userId, 
+                data.RESPONSES.RESPONSE[0].USER[0]) : gnError(data.RESPONSES.MESSAGE[0])      
+        }
+    }); 
+}
+
+/*
+ * Function: updateUserId.
+ * Description: Updates config file with a User ID provided by Gracenote.
+ * Global variable userId is updated as well with the new value.
+ * Parameter: A String, which represents the current userId.
+ * Parameter: A String, which represents the new userId.
+ */
+function updateUserId(userId, newUserId) {
+    // This needs to be done synchronously. This could change to async if multi API users //supported.
+    var configFileContent = fs.readFileSync('./config.js', {encoding: 'utf-8'});
+    configFileContent = configFileContent.replace(userId, newUserId);
+    fs.writeFileSync('./config.js', configFileContent);
+    console.log("[OK] CONFIGURATION UPDATED SUCCESSFULLY!");
+    userId = newUserId;
+    console.log("[OK] Your user ID has been updated to: " + userId);
 }
 
 /***************************************************
