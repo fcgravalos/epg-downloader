@@ -8,6 +8,7 @@
 // Load required modules
 var fs = require('fs');
 var gnRequest = require('https').request;
+var xmlBuilder = require('xmlbuilder');
 var xmlParser = require('xml2js').parseString;
 var config = require('./config.js');
 
@@ -26,6 +27,10 @@ var options = {
         //'Content-Length': "@@PLACEHOLDER@@"
     }
 
+};
+
+var commands = {
+    register: 'REGISTER'
 };
 
 /*************
@@ -77,7 +82,7 @@ function gnHttpRequest(body, callback) {
  * Receives: A String which contains the error message.
  */
 function gnError(error) {
-    console.log("[FAILED]" + error);
+    console.error("[FAILED] " + error);
 }
 
 /*****************************************
@@ -99,8 +104,17 @@ function initialize(){
  * to gnHttpRequest
  */  
 function register() {
-    //Next step: Create XML with any npm package.
-    gnHttpRequest("<QUERIES><QUERY CMD='REGISTER'><CLIENT>15779840-29EADFCFD79116D69600C0DDD4BC2AD8</CLIENT></QUERY></QUERIES>", registerCallback);
+    var xml = xmlBuilder.create({
+        QUERIES: {
+            QUERY: {
+                '@CMD': commands.register, 
+                CLIENT: {
+                    '#text': clientId
+                }
+            } 
+        }
+    }).end({pretty:true});
+    gnHttpRequest(xml, registerCallback);
 }
 
 /*
