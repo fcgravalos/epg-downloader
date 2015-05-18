@@ -30,7 +30,8 @@ var options = {
 };
 
 var commands = {
-    register: 'REGISTER'
+    register: 'REGISTER',
+    tvprovider: 'TVPROVIDER_LOOKUP'
 };
 
 /*************
@@ -42,7 +43,19 @@ var commands = {
 /*******************************
  * SECTION : GENERIC FUNCTIONS *
  *******************************/
-
+function queryComposer(){}
+function authenticate(){
+    return {
+        AUTH: {
+            CLIENT: {
+                '#text': clientId
+            },
+            USER: {
+                '#text': userId       
+                    }   
+            }
+    }
+}
 /*
  * Function: gnHttpRequest.
  * Description: A generic function to create HTTPS requests to Gracenote 
@@ -160,18 +173,47 @@ function updateUserId(userId, newUserId) {
  * Description: Callback function that will be passed to gnHttpRequest.
  * Parameter: A String which represents the XML response from Gracenote.
  */ 
-function tvProviderLookupCallback(xmlResponse){}
+function tvProviderLookupCallback(xmlResponse){
+    console.log(xmlResponse);
+}
 
 /*
  * Function: tvProviderLookup.
  * Description: Builds the XML body request and passes it and the tvProviderLookupCallback 
  * to gnHttpRequest
  */
-function tvProviderLookUp() {}
+function tvProviderLookUp(lang, country, postalCode){
+    var xml = xmlBuilder.create({
+        QUERIES: {
+             AUTH: {
+                    CLIENT: {
+                        '#text': clientId
+                    },
+                    USER: {
+                        '#text': userId       
+                    }   
+            },
+            LANG: {
+                '#text': lang
+            },
+            COUNTRY: {
+                '#text': country
+            },
+            QUERY: {
+                '@CMD': commands.tvprovider,
+                POSTALCODE: {
+                    '#text': postalCode
+                }      
+            }
+        }
+    }).end({pretty:true});
+    //console.log(xml)
+    gnHttpRequest(xml, tvProviderLookupCallback);
+}
 
-/***************************************************
- * SECTION : GRACENOTE CHANNEL LOOKUP FUNCTIONS    *
- ***************************************************/
+/************************************************
+ * SECTION : GRACENOTE CHANNEL LOOKUP FUNCTIONS *
+ ************************************************/
 
 /*
  * Function: tvChannelLookupCallback.
@@ -187,4 +229,4 @@ function channelLookUpCallback(){}
  */
 function channelLookUp(){}
 
-initialize();
+tvProviderLookUp('ger', 'usa', '94608');
