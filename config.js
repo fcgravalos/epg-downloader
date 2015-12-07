@@ -11,9 +11,9 @@ var config = {
     allowedMethods : ['GET', 'POST', 'PUT', 'DELETE'],
     
     // Gracenote API Config. Think if better in database to support multi-user API handling.
-    clientId : "15779840-29EADFCFD79116D69600C0DDD4BC2AD8",
-    userId : "280724324967249114-6796C6E52EBD6677D828DBEE8334DC6D",
-    gnApiUrl : "https://c15779840.ipg.web.cddbp.net/webapi/xml/1.0/"
+    clientId : "MY_CLIENT_ID",
+    userId : "MY_USER_ID",
+    gnApiUrl : "https://cXXXXXXX.ipg.web.cddbp.net/webapi/xml/1.0/"
 };
 
 function getProperty(key) {
